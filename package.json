@@ -1,0 +1,22 @@
+{
+  "name": "war-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gr8guyrabi/war-server.git"
+  },
+  "author": "LR",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gr8guyrabi/war-server/issues"
+  },
+  "homepage": "https://github.com/gr8guyrabi/war-server#readme",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  }
+}
