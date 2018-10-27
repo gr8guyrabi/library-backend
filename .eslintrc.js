@@ -9,8 +9,9 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ['problems', 'prettier'],
+  extends: 'problems',
+  plugins: ['prettier'],
   rules: {
-    semi: 2,
+    'prettier/prettier': 'warn'
   },
 };
