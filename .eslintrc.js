@@ -8,10 +8,11 @@ module.exports = {
   },
   env: {
     node: true,
+    jest: true,
   },
   extends: 'problems',
   plugins: ['prettier'],
   rules: {
-    'prettier/prettier': 'warn'
+    'prettier/prettier': 'warn',
   },
 };
