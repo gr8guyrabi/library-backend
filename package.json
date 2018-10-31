@@ -1,0 +1,28 @@
+{
+  "name": "war-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gr8guyrabi/war-server.git"
+  },
+  "author": "LR",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gr8guyrabi/war-server/issues"
+  },
+  "homepage": "https://github.com/gr8guyrabi/war-server#readme",
+  "devDependencies": {
+    "eslint": "^5.7.0",
+    "eslint-config-problems": "^1.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "husky": "^1.1.2",
+    "jest": "^23.6.0",
+    "lint-staged": "^7.3.0",
+    "prettier": "1.14.3"
+  }
+}
