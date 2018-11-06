@@ -5,19 +5,46 @@ const { ApolloServer, gql } = require('apollo-server');
 // from an existing data source like a REST API or database.
 const books = [
   {
+    id: 1,
     title: 'Harry Potter and the Chamber of Secrets',
-    author: 'J.K. Rowling',
+    author: 1,
   },
   {
+    id: 2,
     title: 'Jurassic Park',
-    author: 'Michael Crichton',
+    author: 2,
+  },
+  {
+    id: 3,
+    title: 'The Cave',
+    author: 3,
   },
 ];
 
 const users = [
   {
+    id: 1,
+    name: 'J.K. Rowling',
+    address: 'U.K.',
+    favoriteBook: 1,
+  },
+  {
+    id: 2,
+    name: 'Michael Crichton',
+    address: 'USA',
+    favoriteBook: 2,
+  },
+  {
+    id: 3,
     name: 'Batman',
     address: 'Gotham',
+    favoriteBook: 1,
+  },
+  {
+    id: 4,
+    name: 'Spiderman',
+    address: 'New York',
+    favoriteBook: 2,
   },
 ];
 
@@ -29,19 +56,20 @@ const typeDefs = gql`
   # This "Book" type can be used in other type declarations.
   type Book {
     title: String
-    author: String
+    author: User
   }
 
   type User {
     name: String
     address: String
+    favoriteBook: Book
   }
 
   # The "Query" type is the root of all GraphQL queries.
   # (A "Mutation" type will be covered later on.)
   type Query {
     books: [Book]
-    users: [User]
+    users(name: String): [User]
   }
 `;
 
@@ -50,7 +78,14 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     books: () => books,
-    users: () => users,
+    users: (obj, args) =>
+      users.filter(user => (args.name ? user.name === args.name : true)),
+  },
+  User: {
+    favoriteBook: user => books.find(book => book.id === user.favoriteBook),
+  },
+  Book: {
+    author: author => users.find(user => user.id === author.id),
   },
 };
 
