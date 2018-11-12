@@ -6,45 +6,67 @@ const { ApolloServer, gql } = require('apollo-server');
 const books = [
   {
     id: 1,
-    title: 'Harry Potter and the Chamber of Secrets',
+    name: 'Harry Potter and the Chamber of Secrets',
     author: 1,
+    tags: ['SciFi', 'Adventure'],
+    status: 'Available',
   },
   {
     id: 2,
-    title: 'Jurassic Park',
+    name: 'Jurassic Park',
     author: 2,
+    tags: ['SciFi'],
+    status: 'Missing',
   },
   {
     id: 3,
-    title: 'The Cave',
+    name: 'The Cave',
     author: 3,
+    tags: ['Adventure'],
+    status: 'Checked',
   },
 ];
 
 const users = [
   {
     id: 1,
-    name: 'J.K. Rowling',
+    firstName: 'J.K.',
+    lastName: 'Rowling',
     address: 'U.K.',
-    favoriteBook: 1,
+    dob: '21/03/1980',
+    interest: ['SciFi', 'Adventure'],
+    isActive: true,
+    favoriteBooks: [1],
   },
   {
     id: 2,
-    name: 'Michael Crichton',
+    firstName: 'Michael',
+    lastName: 'Crichton',
     address: 'USA',
-    favoriteBook: 2,
+    dob: '04/03/1970',
+    interest: ['SciFi'],
+    isActive: true,
+    favoriteBooks: [1, 2],
   },
   {
     id: 3,
-    name: 'Batman',
+    firstName: 'Batman',
+    lastName: '',
     address: 'Gotham',
-    favoriteBook: 1,
+    dob: '21/03/1988',
+    interest: ['Adventure'],
+    isActive: true,
+    favoriteBooks: [1, 3],
   },
   {
     id: 4,
-    name: 'Spiderman',
+    firstName: 'Spiderman',
+    lastName: 'Amazing',
     address: 'New York',
-    favoriteBook: 2,
+    dob: '23/07/1992',
+    interest: ['SciFi', 'Adventure'],
+    isActive: false,
+    favoriteBooks: [1, 2, 3],
   },
 ];
 
@@ -55,21 +77,40 @@ const typeDefs = gql`
 
   # This "Book" type can be used in other type declarations.
   type Book {
-    title: String
+    name: String
     author: User
+    image: String
+    tags: [Tags]
+    Status: BookStatus
+  }
+
+  enum BookStatus {
+    Checked
+    Available
+    Missing
+  }
+
+  enum Tags {
+    SciFi
+    Adventure
   }
 
   type User {
-    name: String
+    firstName: String
+    lastName: String
     address: String
-    favoriteBook: Book
+    photo: String
+    dob: String
+    interest: [Tags]
+    isActive: Boolean
+    favoriteBooks: [Book]
   }
 
   # The "Query" type is the root of all GraphQL queries.
   # (A "Mutation" type will be covered later on.)
   type Query {
     books: [Book]
-    users(name: String): [User]
+    users(firstName: String): [User]
   }
 `;
 
@@ -79,10 +120,13 @@ const resolvers = {
   Query: {
     books: () => books,
     users: (obj, args) =>
-      users.filter(user => (args.name ? user.name === args.name : true)),
+      users.filter(
+        user => (args.firstName ? user.firstName === args.firstName : true)
+      ),
   },
   User: {
-    favoriteBook: user => books.find(book => book.id === user.favoriteBook),
+    favoriteBooks: user =>
+      books.filter(book => user.favoriteBooks.includes(book.id)),
   },
   Book: {
     author: author => users.find(user => user.id === author.id),
