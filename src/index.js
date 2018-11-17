@@ -9,21 +9,18 @@ const books = [
     name: 'Harry Potter and the Chamber of Secrets',
     author: 1,
     tags: ['SciFi', 'Adventure'],
-    status: 'Available',
   },
   {
     id: 2,
     name: 'Jurassic Park',
     author: 2,
     tags: ['SciFi'],
-    status: 'Missing',
   },
   {
     id: 3,
     name: 'The Cave',
     author: 3,
     tags: ['Adventure'],
-    status: 'Checked',
   },
 ];
 
@@ -34,7 +31,7 @@ const users = [
     lastName: 'Rowling',
     address: 'U.K.',
     dob: '21/03/1980',
-    interest: ['SciFi', 'Adventure'],
+    interests: ['SciFi', 'Adventure'],
     isActive: true,
     favoriteBooks: [1],
   },
@@ -44,7 +41,7 @@ const users = [
     lastName: 'Crichton',
     address: 'USA',
     dob: '04/03/1970',
-    interest: ['SciFi'],
+    interests: ['SciFi'],
     isActive: true,
     favoriteBooks: [1, 2],
   },
@@ -54,7 +51,7 @@ const users = [
     lastName: '',
     address: 'Gotham',
     dob: '21/03/1988',
-    interest: ['Adventure'],
+    interests: ['Adventure'],
     isActive: true,
     favoriteBooks: [1, 3],
   },
@@ -64,9 +61,51 @@ const users = [
     lastName: 'Amazing',
     address: 'New York',
     dob: '23/07/1992',
-    interest: ['SciFi', 'Adventure'],
+    interests: ['SciFi', 'Adventure'],
     isActive: false,
     favoriteBooks: [1, 2, 3],
+  },
+];
+
+const publications = [
+  {
+    id: 1,
+    name: 'Rolling',
+    author: 'J.K. Rolling',
+    tags: ['SciFi', 'Adventure'],
+  },
+];
+
+const CopyStatus = [
+  {
+    id: 1,
+    name: 'Rolling',
+    author: 'J.K. Rolling',
+    tags: ['SciFi', 'Adventure'],
+    book: 1,
+    borrower: 1,
+    status: 'Checked',
+    quality: 'Excellent',
+  },
+  {
+    id: 2,
+    name: 'Huff',
+    author: 'Loof',
+    tags: ['Adventure'],
+    book: 2,
+    borrower: 1,
+    status: 'Available',
+    quality: 'Good',
+  },
+  {
+    id: 1,
+    name: 'Rolling',
+    author: 'J.K. Rolling',
+    tags: ['SciFi', 'Adventure'],
+    book: 1,
+    borrower: 1,
+    status: 'Checked',
+    quality: 'Excellent',
   },
 ];
 
@@ -74,14 +113,52 @@ const users = [
 // which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql`
   # Comments in GraphQL are defined with the hash (#) symbol.
-
   # This "Book" type can be used in other type declarations.
-  type Book {
+
+  interface Publication {
+    id: ID!
     name: String
     author: User
     image: String
-    tags: [Tags]
-    Status: BookStatus
+    tags: [Tag]
+  }
+
+  type Book implements Publication {
+    id: ID!
+    name: String
+    author: User
+    image: String
+    tags: [Tag]
+  }
+
+  type CopyStatus implements Publication {
+    id: ID!
+    name: String
+    author: User
+    image: String
+    tags: [Tag]
+    book: Book
+    borrower: User
+    status: BookStatus
+    quality: Quality
+  }
+
+  type User {
+    id: ID!
+    firstName: String
+    lastName: String
+    address: String
+    photo: String
+    dob: String
+    interests: [Tag]
+    isActive: Boolean
+    favoriteBooks: [Book]
+  }
+
+  enum Quality {
+    Poor
+    Good
+    Excellent
   }
 
   enum BookStatus {
@@ -90,27 +167,18 @@ const typeDefs = gql`
     Missing
   }
 
-  enum Tags {
+  enum Tag {
     SciFi
     Adventure
-  }
-
-  type User {
-    firstName: String
-    lastName: String
-    address: String
-    photo: String
-    dob: String
-    interest: [Tags]
-    isActive: Boolean
-    favoriteBooks: [Book]
   }
 
   # The "Query" type is the root of all GraphQL queries.
   # (A "Mutation" type will be covered later on.)
   type Query {
-    books: [Book]
+    books(name: String): [Book]
     users(firstName: String): [User]
+    tags(tag: String): [Book]
+    interests(interest: String): [User]
   }
 `;
 
@@ -118,10 +186,17 @@ const typeDefs = gql`
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
   Query: {
-    books: () => books,
+    books: (obj, args) =>
+      books.filter(book => (args.name ? args.name === book.name : true)),
     users: (obj, args) =>
       users.filter(
         user => (args.firstName ? user.firstName === args.firstName : true)
+      ),
+    tags: (obj, args) =>
+      books.filter(book => (args.tag ? book.tags.includes(args.tag) : true)),
+    interests: (obj, args) =>
+      users.filter(
+        user => (args.interest ? user.interests.includes(args.interest) : true)
       ),
   },
   User: {
