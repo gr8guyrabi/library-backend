@@ -1,93 +1,89 @@
 const { ApolloServer, gql } = require('apollo-server');
 
-// This is a (sample) collection of books we'll be able to query
-// the GraphQL server for.  A more complete example might fetch
-// from an existing data source like a REST API or database.
-const books = [
-  {
-    id: 1,
-    title: 'Harry Potter and the Chamber of Secrets',
-    author: 1,
-  },
-  {
-    id: 2,
-    title: 'Jurassic Park',
-    author: 2,
-  },
-  {
-    id: 3,
-    title: 'The Cave',
-    author: 3,
-  },
-];
-
-const users = [
-  {
-    id: 1,
-    name: 'J.K. Rowling',
-    address: 'U.K.',
-    favoriteBook: 1,
-  },
-  {
-    id: 2,
-    name: 'Michael Crichton',
-    address: 'USA',
-    favoriteBook: 2,
-  },
-  {
-    id: 3,
-    name: 'Batman',
-    address: 'Gotham',
-    favoriteBook: 1,
-  },
-  {
-    id: 4,
-    name: 'Spiderman',
-    address: 'New York',
-    favoriteBook: 2,
-  },
-];
-
 // Type definitions define the "shape" of your data and specify
 // which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql`
   # Comments in GraphQL are defined with the hash (#) symbol.
-
   # This "Book" type can be used in other type declarations.
+
   type Book {
-    title: String
+    id: ID!
+    name: String
     author: User
+    image: String
+    tags: [Tag]
   }
 
-  type User {
-    name: String
+  type Copy {
+    id: ID!
+    book: Book
+    borrower: User
+    status: CopyStatus
+    quality: Quality
+  }
+
+  interface User {
+    id: ID!
+    firstName: String
+    lastName: String
     address: String
-    favoriteBook: Book
+    photo: String
+    dob: String
+  }
+
+  type Student implements User {
+    id: ID!
+    firstName: String
+    lastName: String
+    address: String
+    photo: String
+    dob: String
+
+    school: String
+    isActive: Boolean
+    interests: [Tag]
+    favoriteBooks: [Book]
+  }
+
+  type Teacher implements User {
+    id: ID!
+    firstName: String
+    lastName: String
+    address: String
+    photo: String
+    dob: String
+  }
+
+  enum Quality {
+    POOR
+    GOOD
+    EXCELLENT
+  }
+
+  enum CopyStatus {
+    CHECKED
+    AVAILABLE
+    MISSING
+  }
+
+  type Tag {
+    id: ID!
+    name: String!
   }
 
   # The "Query" type is the root of all GraphQL queries.
   # (A "Mutation" type will be covered later on.)
   type Query {
-    books: [Book]
-    users(name: String): [User]
+    books(name: String): [Book]
+    users(firstName: String): [User]
+    tags(tag: String): [Book]
+    interests(interest: String): [User]
   }
 `;
 
 // Resolvers define the technique for fetching the types in the
 // schema.  We'll retrieve books from the "books" array above.
-const resolvers = {
-  Query: {
-    books: () => books,
-    users: (obj, args) =>
-      users.filter(user => (args.name ? user.name === args.name : true)),
-  },
-  User: {
-    favoriteBook: user => books.find(book => book.id === user.favoriteBook),
-  },
-  Book: {
-    author: author => users.find(user => user.id === author.id),
-  },
-};
+const resolvers = {};
 
 // In the most basic sense, the ApolloServer can be started
 // by passing type definitions (typeDefs) and the resolvers
