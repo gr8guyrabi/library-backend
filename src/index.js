@@ -1,121 +1,12 @@
 const { ApolloServer, gql } = require('apollo-server');
 
-// This is a (sample) collection of books we'll be able to query
-// the GraphQL server for.  A more complete example might fetch
-// from an existing data source like a REST API or database.
-const books = [
-  {
-    id: 1,
-    name: 'Harry Potter and the Chamber of Secrets',
-    author: 1,
-    tags: ['SciFi', 'Adventure'],
-  },
-  {
-    id: 2,
-    name: 'Jurassic Park',
-    author: 2,
-    tags: ['SciFi'],
-  },
-  {
-    id: 3,
-    name: 'The Cave',
-    author: 3,
-    tags: ['Adventure'],
-  },
-];
-
-const users = [
-  {
-    id: 1,
-    firstName: 'J.K.',
-    lastName: 'Rowling',
-    address: 'U.K.',
-    dob: '21/03/1980',
-    interests: ['SciFi', 'Adventure'],
-    isActive: true,
-    favoriteBooks: [1],
-  },
-  {
-    id: 2,
-    firstName: 'Michael',
-    lastName: 'Crichton',
-    address: 'USA',
-    dob: '04/03/1970',
-    interests: ['SciFi'],
-    isActive: true,
-    favoriteBooks: [1, 2],
-  },
-  {
-    id: 3,
-    firstName: 'Batman',
-    lastName: '',
-    address: 'Gotham',
-    dob: '21/03/1988',
-    interests: ['Adventure'],
-    isActive: true,
-    favoriteBooks: [1, 3],
-  },
-  {
-    id: 4,
-    firstName: 'Spiderman',
-    lastName: 'Amazing',
-    address: 'New York',
-    dob: '23/07/1992',
-    interests: ['SciFi', 'Adventure'],
-    isActive: false,
-    favoriteBooks: [1, 2, 3],
-  },
-];
-
-const publications = [
-  {
-    id: 1,
-    name: 'Rolling',
-    author: 'J.K. Rolling',
-    tags: ['SciFi', 'Adventure'],
-  },
-];
-
-const CopyStatus = [
-  {
-    id: 1,
-    name: 'Rolling',
-    author: 'J.K. Rolling',
-    tags: ['SciFi', 'Adventure'],
-    book: 1,
-    borrower: 1,
-    status: 'Checked',
-    quality: 'Excellent',
-  },
-  {
-    id: 2,
-    name: 'Huff',
-    author: 'Loof',
-    tags: ['Adventure'],
-    book: 2,
-    borrower: 1,
-    status: 'Available',
-    quality: 'Good',
-  },
-  {
-    id: 1,
-    name: 'Rolling',
-    author: 'J.K. Rolling',
-    tags: ['SciFi', 'Adventure'],
-    book: 1,
-    borrower: 1,
-    status: 'Checked',
-    quality: 'Excellent',
-  },
-];
-
 // Type definitions define the "shape" of your data and specify
 // which ways the data can be fetched from the GraphQL server.
 const typeDefs = gql`
   # Comments in GraphQL are defined with the hash (#) symbol.
   # This "Book" type can be used in other type declarations.
 
-  interface Publication {
+  type Book {
     id: ID!
     name: String
     author: User
@@ -123,53 +14,61 @@ const typeDefs = gql`
     tags: [Tag]
   }
 
-  type Book implements Publication {
+  type Copy {
     id: ID!
-    name: String
-    author: User
-    image: String
-    tags: [Tag]
-  }
-
-  type CopyStatus implements Publication {
-    id: ID!
-    name: String
-    author: User
-    image: String
-    tags: [Tag]
     book: Book
     borrower: User
-    status: BookStatus
+    status: CopyStatus
     quality: Quality
   }
 
-  type User {
+  interface User {
     id: ID!
     firstName: String
     lastName: String
     address: String
     photo: String
     dob: String
-    interests: [Tag]
+  }
+
+  type Student implements User {
+    id: ID!
+    firstName: String
+    lastName: String
+    address: String
+    photo: String
+    dob: String
+
+    school: String
     isActive: Boolean
+    interests: [Tag]
     favoriteBooks: [Book]
   }
 
+  type Teacher implements User {
+    id: ID!
+    firstName: String
+    lastName: String
+    address: String
+    photo: String
+    dob: String
+  }
+
   enum Quality {
-    Poor
-    Good
-    Excellent
+    POOR
+    GOOD
+    EXCELLENT
   }
 
-  enum BookStatus {
-    Checked
-    Available
-    Missing
+  enum CopyStatus {
+    CHECKED
+    AVAILABLE
+    MISSING
   }
 
-  enum Tag {
-    SciFi
-    Adventure
+  type Tag {
+    id: ID!
+    name: String!
   }
 
   # The "Query" type is the root of all GraphQL queries.
@@ -184,29 +83,7 @@ const typeDefs = gql`
 
 // Resolvers define the technique for fetching the types in the
 // schema.  We'll retrieve books from the "books" array above.
-const resolvers = {
-  Query: {
-    books: (obj, args) =>
-      books.filter(book => (args.name ? args.name === book.name : true)),
-    users: (obj, args) =>
-      users.filter(
-        user => (args.firstName ? user.firstName === args.firstName : true)
-      ),
-    tags: (obj, args) =>
-      books.filter(book => (args.tag ? book.tags.includes(args.tag) : true)),
-    interests: (obj, args) =>
-      users.filter(
-        user => (args.interest ? user.interests.includes(args.interest) : true)
-      ),
-  },
-  User: {
-    favoriteBooks: user =>
-      books.filter(book => user.favoriteBooks.includes(book.id)),
-  },
-  Book: {
-    author: author => users.find(user => user.id === author.id),
-  },
-};
+const resolvers = {};
 
 // In the most basic sense, the ApolloServer can be started
 // by passing type definitions (typeDefs) and the resolvers
