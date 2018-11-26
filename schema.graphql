@@ -1,0 +1,77 @@
+type Query {
+    books(name: String): [Book]
+    students(firstName: String): [Student]
+    teachers(firstName: String): [Teacher]
+  }
+
+type Mutation {
+    createBook(name: String!): Book
+    createTeacher(firstName: String!, lastName: String!): Teacher
+}
+
+
+
+type Book {
+  id: ID!
+  name: String
+  author: String
+  image: String
+  tags: [Tag!]!
+}
+
+type Copy {
+  id: ID!
+  book: Book
+  borrower: Student
+  status: CopyStatus
+  quality: Quality
+}
+
+interface User {
+  id: ID!
+  firstName: String
+  lastName: String
+  address: String
+  photo: String
+  dob: String
+}
+
+type Student implements User {
+  id: ID!
+  firstName: String
+  lastName: String
+  address: String
+  photo: String
+  dob: String
+
+  school: String
+  isActive: Boolean
+  interests: [Tag!]!
+  favoriteBooks: [Book!]!
+}
+
+type Teacher implements User {
+  id: ID!
+  firstName: String
+  lastName: String
+  address: String
+  photo: String
+  dob: String
+}
+
+enum Quality {
+  POOR
+  GOOD
+  EXCELLENT
+}
+
+enum CopyStatus {
+  CHECKED
+  AVAILABLE
+  MISSING
+}
+
+type Tag {
+  id: ID!
+  name: String!
+}

@@ -1,0 +1,64 @@
+type Book {
+  id: ID! @unique
+  name: String
+  author: String
+  image: String
+  tags: [Tag!]!
+}
+
+type Copy {
+  id: ID! @unique
+  book: Book
+  borrower: Student
+  status: CopyStatus
+  quality: Quality
+}
+
+interface User {
+  id: ID! @unique
+  firstName: String
+  lastName: String
+  address: String
+  photo: String
+  dob: String
+}
+
+type Student implements User {
+  id: ID! @unique
+  firstName: String
+  lastName: String
+  address: String
+  photo: String
+  dob: String
+
+  school: String
+  isActive: Boolean
+  interests: [Tag!]!
+  favoriteBooks: [Book!]!
+}
+
+type Teacher implements User {
+  id: ID! @unique
+  firstName: String
+  lastName: String
+  address: String
+  photo: String
+  dob: String
+}
+
+enum Quality {
+  POOR
+  GOOD
+  EXCELLENT
+}
+
+enum CopyStatus {
+  CHECKED
+  AVAILABLE
+  MISSING
+}
+
+type Tag {
+  id: ID! @unique
+  name: String!
+}
